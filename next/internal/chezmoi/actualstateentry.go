@@ -2,6 +2,7 @@ package chezmoi
 
 import (
 	"os"
+	"path/filepath"
 )
 
 // An ActualStateEntry represents the actual state of an entry in the
@@ -69,7 +70,11 @@ func NewActualStateEntry(s System, path string) (ActualStateEntry, error) {
 			path: path,
 			lazyLinkname: &lazyLinkname{
 				linknameFunc: func() (string, error) {
-					return s.Readlink(path)
+					linkname, err := s.Readlink(path)
+					if err != nil {
+						return "", err
+					}
+					return filepath.ToSlash(linkname), nil
 				},
 			},
 		}, nil

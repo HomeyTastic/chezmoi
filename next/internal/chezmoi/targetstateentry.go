@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"os"
 	"path"
+	"path/filepath"
 	"time"
 )
 
@@ -359,7 +360,7 @@ func (t *TargetStateSymlink) Apply(s System, ps PersistentState, actualStateEntr
 	if err := actualStateEntry.Remove(s); err != nil {
 		return err
 	}
-	return s.WriteSymlink(linkname, actualStateEntry.Path())
+	return s.WriteSymlink(filepath.FromSlash(linkname), actualStateEntry.Path())
 }
 
 // EntryState returns t's entry state.
