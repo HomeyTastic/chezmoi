@@ -57,7 +57,7 @@ type Config struct {
 	useBuiltinGit   bool
 
 	// Global configuration, settable in the config file.
-	HomeDirStr    string                 `mapstructure:"homeDir"`
+	HomeDir       string                 `mapstructure:"homeDir"`
 	SourceDirStr  string                 `mapstructure:"sourceDir"`
 	DestDirStr    string                 `mapstructure:"destDir"`
 	Umask         fileMode               `mapstructure:"umask"`
@@ -190,7 +190,7 @@ func newConfig(options ...configOption) (*Config, error) {
 	c := &Config{
 		bds:           bds,
 		fs:            vfs.OSFS,
-		HomeDirStr:    homeDir,
+		HomeDir:       homeDir,
 		DestDirStr:    homeDir,
 		Umask:         fileMode(chezmoi.GetUmask()),
 		Color:         "auto",
@@ -304,7 +304,7 @@ func newConfig(options ...configOption) (*Config, error) {
 	c.configFileStr = defaultConfigFile(c.fs, c.bds).String()
 	c.SourceDirStr = defaultSourceDir(c.fs, c.bds).String()
 
-	c.normalizedHomeDir, err = chezmoi.NormalizePath(c.HomeDirStr)
+	c.normalizedHomeDir, err = chezmoi.NormalizePath(c.HomeDir)
 	if err != nil {
 		return nil, err
 	}
@@ -371,7 +371,7 @@ func (c *Config) cmdOutput(dir, name string, args []string) ([]byte, error) {
 func (c *Config) defaultTemplateData() map[string]interface{} {
 	data := map[string]interface{}{
 		"arch":      runtime.GOARCH,
-		"homeDir":   c.HomeDirStr,
+		"homeDir":   c.HomeDir,
 		"os":        runtime.GOOS,
 		"sourceDir": c.normalizedSourceDir,
 		"version": map[string]interface{}{
