@@ -7,9 +7,35 @@ import (
 	"strings"
 )
 
+// ExpandTilde expands a leading tilde in path.
+func ExpandTilde(path, homeDir string) string {
+	switch {
+	case path == "~":
+		return homeDir
+	case len(path) >= 2 && path[0] == '~' && isSlash(path[1]):
+		return filepath.ToSlash(filepath.Join(homeDir, path[2:]))
+	default:
+		return path
+	}
+}
+
 // GetUmask returns the umask.
 func GetUmask() os.FileMode {
 	return os.FileMode(0)
+}
+
+// NormalizePath returns path normalized. On Windows, normalized paths are
+// absolute paths with a uppercase volume name and forward slashes.
+func NormalizePath(path string) (string, error) {
+	var err error
+	path, err = filepath.Abs(path)
+	if err != nil {
+		return "", err
+	}
+	if n := volumeNameLen(path); n > 0 {
+		path = strings.ToUpper(path[:n]) + path[n:]
+	}
+	return filepath.ToSlash(path), nil
 }
 
 // TrimDirPrefix returns path with the directory prefix dir stripped. path must
@@ -37,25 +63,6 @@ func isPrivate(info os.FileInfo) bool {
 
 func isSlash(c uint8) bool {
 	return c == '\\' || c == '/'
-}
-
-func normalizePath(p, homeDir string) (string, error) {
-	switch {
-	case p == "~":
-		return homeDir, nil
-	case len(p) >= 2 && p[0] == '~' && isSlash(p[1]):
-		return filepath.ToSlash(filepath.Join(homeDir, p[2:])), nil
-	default:
-		var err error
-		p, err = filepath.Abs(p)
-		if err != nil {
-			return "", err
-		}
-		if n := volumeNameLen(p); n > 0 {
-			p = strings.ToUpper(p[:n]) + p[n:]
-		}
-		return filepath.ToSlash(p), nil
-	}
 }
 
 // umaskPermEqual returns true on Windows.

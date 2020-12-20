@@ -112,6 +112,7 @@ type Config struct {
 
 	// Computed configuration.
 	absSlashConfigFile string
+	absSlashHomeDir    string
 	absSlashSourceDir  string
 	absSlashDestDir    string
 
@@ -256,9 +257,10 @@ func newConfig(options ...configOption) (*Config, error) {
 			include:   chezmoi.NewIncludeSet(chezmoi.IncludeAll &^ chezmoi.IncludeScripts),
 			recursive: true,
 		},
-		stdin:  os.Stdin,
-		stdout: os.Stdout,
-		stderr: os.Stderr,
+		stdin:           os.Stdin,
+		stdout:          os.Stdout,
+		stderr:          os.Stderr,
+		absSlashHomeDir: filepath.ToSlash(homeDir),
 	}
 
 	for key, value := range map[string]interface{}{
@@ -405,9 +407,8 @@ func (c *Config) defaultTemplateData() map[string]interface{} {
 	}
 
 	if homeDir, err := os.UserHomeDir(); err == nil {
-		absHomeDir, err := filepath.Abs(homeDir)
 		if err == nil {
-			data["homeDir"] = filepath.ToSlash(absHomeDir)
+			data["homeDir"] = filepath.ToSlash(homeDir)
 		}
 	}
 
@@ -461,10 +462,15 @@ func (c *Config) destPathInfos(sourceState *chezmoi.SourceState, args []string, 
 }
 
 func (c *Config) doPurge(purgeOptions *purgeOptions) error {
+	absSlashPersistentStateFile, err := c.persistentStateFile().TildeAbsSlash(c.absSlashHomeDir)
+	if err != nil {
+		return err
+	}
+
 	paths := []string{
 		path.Dir(c.absSlashConfigFile),
 		c.absSlashConfigFile,
-		c.persistentStateFile().String(),
+		absSlashPersistentStateFile,
 		c.absSlashSourceDir,
 	}
 	if purgeOptions != nil && purgeOptions.binary {

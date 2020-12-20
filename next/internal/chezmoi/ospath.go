@@ -17,9 +17,9 @@ func NewOSPath(s string) *OSPath {
 }
 
 // TildeAbsSlash returns p converted to an absolute path with a leading tilde
-// expanded to homeDirStr and backslashes replaced by forward slashes.
-func (p *OSPath) TildeAbsSlash(homeDirStr string) (string, error) {
-	return normalizePath(p.s, homeDirStr)
+// expanded to normalizedHomeDir and backslashes replaced by forward slashes.
+func (p *OSPath) TildeAbsSlash(normalizedHomeDir string) (string, error) {
+	return NormalizePath(ExpandTilde(p.s, normalizedHomeDir))
 }
 
 // Dir returns p's directory.

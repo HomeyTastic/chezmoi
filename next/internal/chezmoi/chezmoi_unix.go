@@ -18,9 +18,27 @@ func init() {
 	syscall.Umask(int(umask))
 }
 
+// ExpandTilde expands a leading tilde in path.
+func ExpandTilde(path, homeDir string) string {
+	switch {
+	case path == "~":
+		return homeDir
+	case strings.HasPrefix(path, "~/"):
+		return filepath.Clean(filepath.Join(homeDir, path[2:]))
+	default:
+		return path
+	}
+}
+
 // GetUmask returns the umask.
 func GetUmask() os.FileMode {
 	return umask
+}
+
+// NormalizePath returns path normalized. On non-Windows systems, normalized
+// paths are absolute paths.
+func NormalizePath(path string) (string, error) {
+	return filepath.Abs(path)
 }
 
 // TrimDirPrefix returns path with the directory prefix dir stripped. path must
@@ -48,17 +66,6 @@ func isExecutable(info os.FileInfo) bool {
 // isPrivate returns if info is private.
 func isPrivate(info os.FileInfo) bool {
 	return info.Mode().Perm()&0o77 == 0
-}
-
-func normalizePath(p, homeDir string) (string, error) {
-	switch {
-	case p == "~":
-		return homeDir, nil
-	case strings.HasPrefix(p, "~/"):
-		return filepath.Clean(filepath.Join(homeDir, p[2:])), nil
-	default:
-		return filepath.Abs(p)
-	}
 }
 
 // umaskPermEqual returns if two permissions are equal after applying umask.

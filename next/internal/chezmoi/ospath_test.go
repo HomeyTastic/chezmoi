@@ -13,17 +13,17 @@ import (
 )
 
 func TestOSPathTildeAbsSlash(t *testing.T) {
-	var homeDirNormalized string
+	var normalizedHomeDir string
 	switch runtime.GOOS {
 	case "windows":
-		homeDirNormalized = "C:/home/user"
+		normalizedHomeDir = "C:/home/user"
 	default:
-		homeDirNormalized = "/home/user"
+		normalizedHomeDir = "/home/user"
 	}
 
 	wd, err := os.Getwd()
 	require.NoError(t, err)
-	wdNormalized, err := normalizePath(wd, homeDirNormalized)
+	normalizedWD, err := NormalizePath(wd)
 	require.NoError(t, err)
 
 	for _, tc := range []struct {
@@ -33,33 +33,33 @@ func TestOSPathTildeAbsSlash(t *testing.T) {
 	}{
 		{
 			name:     "empty",
-			expected: wdNormalized,
+			expected: normalizedWD,
 		},
 		{
 			name:     "file",
 			s:        "file",
-			expected: path.Join(wdNormalized, "file"),
+			expected: path.Join(normalizedWD, "file"),
 		},
 		{
 			name:     "tilde",
 			s:        "~",
-			expected: homeDirNormalized,
+			expected: normalizedHomeDir,
 		},
 		{
 			name:     "tilde_home_file",
 			s:        "~/file",
-			expected: homeDirNormalized + "/file",
+			expected: normalizedHomeDir + "/file",
 		},
 		{
 			name:     "tilde_home_file_windows",
 			s:        `~\file`,
-			expected: homeDirNormalized + "/file",
+			expected: normalizedHomeDir + "/file",
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			chezmoitest.SkipUnlessGOOS(t, tc.name)
 
-			actual, err := NewOSPath(tc.s).TildeAbsSlash(homeDirNormalized)
+			actual, err := NewOSPath(tc.s).TildeAbsSlash(normalizedHomeDir)
 			require.NoError(t, err)
 			assert.Equal(t, tc.expected, actual)
 		})
