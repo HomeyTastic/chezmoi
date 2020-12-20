@@ -90,7 +90,7 @@ func TestApplyCmd(t *testing.T) {
 		},
 		{
 			name: "apply_dir",
-			args: []string{"/home/user/.ssh"},
+			args: []string{"~/.ssh"},
 			tests: []interface{}{
 				vfst.TestPath("/home/user/.ssh",
 					vfst.TestIsDir,
@@ -105,7 +105,7 @@ func TestApplyCmd(t *testing.T) {
 		},
 		{
 			name: "apply_dir_--recursive=false",
-			args: []string{"--recursive=false", "/home/user/.ssh"},
+			args: []string{"--recursive=false", "~/.ssh"},
 			tests: []interface{}{
 				vfst.TestPath("/home/user/.ssh",
 					vfst.TestIsDir,

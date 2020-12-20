@@ -141,6 +141,7 @@ func withTestUser(username string) configOption {
 		default:
 			homeDirStr = "/home/user"
 		}
+		c.HomeDirStr = homeDirStr
 		c.SourceDirStr = filepath.Join(homeDirStr, ".local", "share", "chezmoi")
 		c.DestDirStr = homeDirStr
 		c.Umask = 0o22

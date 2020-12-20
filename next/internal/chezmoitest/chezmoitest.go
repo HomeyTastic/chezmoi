@@ -15,6 +15,16 @@ func JoinLines(lines ...string) string {
 	return strings.Join(lines, "\n") + "\n"
 }
 
+// NormalizedHomeDir returns the normalized home directory.
+func NormalizedHomeDir() string {
+	switch runtime.GOOS {
+	case "windows":
+		return "C:/home/user"
+	default:
+		return "/home/user"
+	}
+}
+
 // SkipUnlessGOOS calls t.Skip() if name does not match runtime.GOOS.
 func SkipUnlessGOOS(t *testing.T, name string) {
 	switch {

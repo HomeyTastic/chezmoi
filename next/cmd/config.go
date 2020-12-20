@@ -177,6 +177,10 @@ func newConfig(options ...configOption) (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
+	normalizedHomeDir, err := chezmoi.NormalizePath(homeDir)
+	if err != nil {
+		return nil, err
+	}
 
 	bds, err := xdg.NewBaseDirectorySpecification()
 	if err != nil {
@@ -257,10 +261,12 @@ func newConfig(options ...configOption) (*Config, error) {
 			include:   chezmoi.NewIncludeSet(chezmoi.IncludeAll &^ chezmoi.IncludeScripts),
 			recursive: true,
 		},
-		stdin:             os.Stdin,
-		stdout:            os.Stdout,
-		stderr:            os.Stderr,
-		normalizedHomeDir: filepath.ToSlash(homeDir),
+
+		stdin:  os.Stdin,
+		stdout: os.Stdout,
+		stderr: os.Stderr,
+
+		normalizedHomeDir: normalizedHomeDir,
 	}
 
 	for key, value := range map[string]interface{}{
@@ -297,6 +303,11 @@ func newConfig(options ...configOption) (*Config, error) {
 
 	c.configFileStr = defaultConfigFile(c.fs, c.bds).String()
 	c.SourceDirStr = defaultSourceDir(c.fs, c.bds).String()
+
+	c.normalizedHomeDir, err = chezmoi.NormalizePath(c.HomeDirStr)
+	if err != nil {
+		return nil, err
+	}
 
 	return c, nil
 }
@@ -360,6 +371,7 @@ func (c *Config) cmdOutput(dir, name string, args []string) ([]byte, error) {
 func (c *Config) defaultTemplateData() map[string]interface{} {
 	data := map[string]interface{}{
 		"arch":      runtime.GOARCH,
+		"homeDir":   c.HomeDirStr,
 		"os":        runtime.GOOS,
 		"sourceDir": c.normalizedSourceDir,
 		"version": map[string]interface{}{
@@ -406,12 +418,6 @@ func (c *Config) defaultTemplateData() map[string]interface{} {
 		data["hostname"] = strings.SplitN(hostname, ".", 2)[0]
 	}
 
-	if homeDir, err := os.UserHomeDir(); err == nil {
-		if err == nil {
-			data["homeDir"] = filepath.ToSlash(homeDir)
-		}
-	}
-
 	if kernelInfo, err := chezmoi.KernelInfo(c.fs); err == nil {
 		data["kernel"] = kernelInfo
 	}
@@ -425,21 +431,21 @@ func (c *Config) defaultTemplateData() map[string]interface{} {
 	}
 }
 
-func (c *Config) destPath(arg *chezmoi.OSPath) (string, error) {
-	path, err := arg.Normalize(c.normalizedHomeDir)
+func (c *Config) normalizedDestPath(arg *chezmoi.OSPath) (string, error) {
+	normalizedPath, err := arg.Normalize(c.normalizedHomeDir)
 	if err != nil {
 		return "", err
 	}
-	if _, err := chezmoi.TrimDirPrefix(path, c.normalizedDestDir); err != nil {
+	if _, err := chezmoi.TrimDirPrefix(normalizedPath, c.normalizedDestDir); err != nil {
 		return "", fmt.Errorf("%s: not in destination directory (%s)", arg, c.normalizedDestDir)
 	}
-	return path, nil
+	return normalizedPath, nil
 }
 
 func (c *Config) destPathInfos(sourceState *chezmoi.SourceState, args []string, recursive bool) (map[string]os.FileInfo, error) {
 	destPathInfos := make(map[string]os.FileInfo)
 	for _, arg := range args {
-		destPath, err := c.destPath(chezmoi.NewOSPath(arg))
+		destPath, err := c.normalizedDestPath(chezmoi.NewOSPath(arg))
 		if err != nil {
 			return nil, err
 		}
@@ -591,7 +597,7 @@ func (c *Config) sourcePaths(s *chezmoi.SourceState, args []string) ([]string, e
 }
 
 func (c *Config) getTargetName(arg *chezmoi.OSPath) (string, error) {
-	destPath, err := c.destPath(arg)
+	destPath, err := c.normalizedDestPath(arg)
 	if err != nil {
 		return "", err
 	}

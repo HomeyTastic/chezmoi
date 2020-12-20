@@ -25,7 +25,7 @@ func TestAddCmd(t *testing.T) {
 					".bashrc": "# contents of .bashrc\n",
 				},
 			},
-			args: []string{"/home/user/.bashrc"},
+			args: []string{"~/.bashrc"},
 			tests: []interface{}{
 				vfst.TestPath("/home/user/.local/share/chezmoi/dot_bashrc",
 					vfst.TestModeIsRegular,
@@ -44,7 +44,7 @@ func TestAddCmd(t *testing.T) {
 					},
 				},
 			},
-			args: []string{"/home/user/.binary"},
+			args: []string{"~/.binary"},
 			tests: []interface{}{
 				vfst.TestPath("/home/user/.local/share/chezmoi/executable_dot_binary",
 					vfst.TestModeIsRegular,
@@ -60,7 +60,7 @@ func TestAddCmd(t *testing.T) {
 					".hushlogin": "",
 				},
 			},
-			args: []string{"/home/user/.hushlogin"},
+			args: []string{"~/.hushlogin"},
 			tests: []interface{}{
 				vfst.TestPath("/home/user/.local/share/chezmoi/empty_dot_hushlogin",
 					vfst.TestDoesNotExist,
@@ -74,7 +74,7 @@ func TestAddCmd(t *testing.T) {
 					".hushlogin": "",
 				},
 			},
-			args: []string{"--empty", "/home/user/.hushlogin"},
+			args: []string{"--empty", "~/.hushlogin"},
 			tests: []interface{}{
 				vfst.TestPath("/home/user/.local/share/chezmoi/empty_dot_hushlogin",
 					vfst.TestModeIsRegular,
@@ -92,7 +92,7 @@ func TestAddCmd(t *testing.T) {
 					},
 				},
 			},
-			args: []string{"/home/user/.symlink"},
+			args: []string{"~/.symlink"},
 			tests: []interface{}{
 				vfst.TestPath("/home/user/.local/share/chezmoi/symlink_dot_symlink",
 					vfst.TestModeIsRegular,
@@ -113,7 +113,7 @@ func TestAddCmd(t *testing.T) {
 					},
 				},
 			},
-			args: []string{"/home/user/.ssh"},
+			args: []string{"~/.ssh"},
 			tests: []interface{}{
 				vfst.TestPath("/home/user/.local/share/chezmoi/private_dot_ssh",
 					vfst.TestIsDir,
@@ -138,7 +138,7 @@ func TestAddCmd(t *testing.T) {
 					},
 				},
 			},
-			args: []string{"/home/user/.ssh/config"},
+			args: []string{"~/.ssh/config"},
 			tests: []interface{}{
 				vfst.TestPath("/home/user/.local/share/chezmoi/private_dot_ssh",
 					vfst.TestIsDir,
