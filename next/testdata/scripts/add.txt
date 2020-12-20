@@ -24,6 +24,11 @@ cmp $CHEZMOISOURCEDIR/empty_dot_hushlogin golden/empty_dot_hushlogin
 chezmoi add $HOME${/}.symlink
 cmp $CHEZMOISOURCEDIR/symlink_dot_symlink golden/symlink_dot_symlink
 
+# test adding a symlink with a separator
+symlink $HOME${/}.ssh_config -> .ssh${/}config
+chezmoi add $HOME${/}.ssh_config
+cmp $CHEZMOISOURCEDIR/symlink_dot_ssh_config golden/symlink_dot_ssh_config
+
 [windows] stop 'remaining tests use file modes'
 
 # test adding a private directory
@@ -34,3 +39,6 @@ stop # FIXME
 
 chezmoi add --exists $HOME${/}.exists
 cmp $CHEZMOISOURCEDIR/exists_dot_exists golden/exists_dot_exists
+
+-- golden/symlink_dot_ssh_config --
+.ssh/config
