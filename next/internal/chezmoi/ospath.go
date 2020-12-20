@@ -1,10 +1,7 @@
 package chezmoi
 
 import (
-	"os"
 	"path/filepath"
-	"runtime"
-	"strings"
 )
 
 // An OSPath is a native OS path.
@@ -22,24 +19,7 @@ func NewOSPath(s string) *OSPath {
 // TildeAbsSlash returns p converted to an absolute path with a leading tilde
 // expanded to homeDirStr and backslashes replaced by forward slashes.
 func (p *OSPath) TildeAbsSlash(homeDirStr string) (string, error) {
-	s := p.s
-	switch {
-	case s == "~":
-		absHomeDirStr, err := filepath.Abs(homeDirStr)
-		if err != nil {
-			return "", err
-		}
-		return filepath.ToSlash(absHomeDirStr), nil
-	case strings.HasPrefix(s, "~/"):
-		fallthrough
-	case runtime.GOOS == "windows" && strings.HasPrefix(s, "~"+string(rune(os.PathSeparator))):
-		s = homeDirStr + string(rune(os.PathSeparator)) + s[2:]
-	}
-	abs, err := filepath.Abs(s)
-	if err != nil {
-		return "", err
-	}
-	return filepath.ToSlash(abs), nil
+	return normalizePath(p.s, homeDirStr)
 }
 
 // Dir returns p's directory.

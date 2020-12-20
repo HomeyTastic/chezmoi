@@ -5,6 +5,7 @@ package chezmoi
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 	"syscall"
 )
@@ -47,6 +48,17 @@ func isExecutable(info os.FileInfo) bool {
 // isPrivate returns if info is private.
 func isPrivate(info os.FileInfo) bool {
 	return info.Mode().Perm()&0o77 == 0
+}
+
+func normalizePath(p, homeDir string) (string, error) {
+	switch {
+	case p == "~":
+		return homeDir, nil
+	case strings.HasPrefix(p, "~/"):
+		return filepath.Clean(filepath.Join(homeDir, p[2:])), nil
+	default:
+		return filepath.Abs(p)
+	}
 }
 
 // umaskPermEqual returns if two permissions are equal after applying umask.

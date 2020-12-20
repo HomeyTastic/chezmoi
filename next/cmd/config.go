@@ -392,7 +392,7 @@ func (c *Config) defaultTemplateData() map[string]interface{} {
 	// solutions.
 	if currentUser, err := user.Current(); err == nil {
 		data["username"] = currentUser.Username
-		if group, err := user.LookupGroupId(currentUser.Gid); err != nil {
+		if group, err := user.LookupGroupId(currentUser.Gid); err == nil {
 			data["group"] = group.Name
 		}
 	} else if user, ok := os.LookupEnv("USER"); ok {

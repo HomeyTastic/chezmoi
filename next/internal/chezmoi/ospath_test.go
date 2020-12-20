@@ -13,62 +13,60 @@ import (
 )
 
 func TestOSPathTildeAbsSlash(t *testing.T) {
+	var homeDirNormalized string
+	switch runtime.GOOS {
+	case "windows":
+		homeDirNormalized = "C:/home/user"
+	default:
+		homeDirNormalized = "/home/user"
+	}
+
 	wd, err := os.Getwd()
 	require.NoError(t, err)
+	wdNormalized, err := normalizePath(wd, homeDirNormalized)
+	require.NoError(t, err)
+
 	for _, tc := range []struct {
-		name       string
-		s          string
-		homeDirStr string
-		expected   string
+		name     string
+		s        string
+		expected string
 	}{
 		{
 			name:     "empty",
-			expected: wd,
+			expected: wdNormalized,
 		},
 		{
 			name:     "file",
 			s:        "file",
-			expected: path.Join(wd, "file"),
+			expected: path.Join(wdNormalized, "file"),
 		},
 		{
-			name:       "tilde",
-			s:          "~",
-			homeDirStr: "/home/user",
-			expected:   "/home/user",
+			name:     "tilde",
+			s:        "~",
+			expected: homeDirNormalized,
 		},
 		{
-			name:       "tilde_home",
-			s:          "~",
-			homeDirStr: "/home/user",
-			expected:   "/home/user",
+			name:     "tilde_home_file",
+			s:        "~/file",
+			expected: homeDirNormalized + "/file",
 		},
 		{
-			name:       "tilde_home_file",
-			s:          "~/file",
-			homeDirStr: "/home/user",
-			expected:   "/home/user/file",
-		},
-		{
-			name:       "tilde_home_file_windows",
-			s:          `~\file`,
-			homeDirStr: `C:\home\user`,
-			expected:   `C:\home\user\file`,
+			name:     "tilde_home_file_windows",
+			s:        `~\file`,
+			expected: homeDirNormalized + "/file",
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			chezmoitest.SkipUnlessGOOS(t, tc.name)
 
-			actual, err := NewOSPath(tc.s).TildeAbsSlash(tc.homeDirStr)
+			actual, err := NewOSPath(tc.s).TildeAbsSlash(homeDirNormalized)
 			require.NoError(t, err)
 			assert.Equal(t, tc.expected, actual)
 		})
 	}
 }
 
-//nolint:paralleltest,tparallel
 func TestOSPathFormat(t *testing.T) {
-	t.Parallel()
-
 	type s struct {
 		Dir *OSPath
 	}
