@@ -7,6 +7,9 @@ type UnusedPersistentState struct{}
 // NewUnusedPersistentState returns a new UnusedPersistentState.
 func NewUnusedPersistentState() UnusedPersistentState { return UnusedPersistentState{} }
 
+// Close does nothing.
+func (UnusedPersistentState) Close() error { return nil }
+
 // CopyTo panics.
 func (UnusedPersistentState) CopyTo(PersistentState) error { panic(nil) }
 

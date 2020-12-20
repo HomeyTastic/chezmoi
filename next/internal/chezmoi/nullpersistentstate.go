@@ -4,6 +4,9 @@ package chezmoi
 // for all reads and silently consumes all writes.
 type NullPersistentState struct{}
 
+// Close does nothing.
+func (NullPersistentState) Close() error { return nil }
+
 // CopyTo does nothing.
 func (NullPersistentState) CopyTo(s PersistentState) error { return nil }
 

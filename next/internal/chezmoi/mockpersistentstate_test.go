@@ -45,4 +45,8 @@ func TestPersistentState(t *testing.T) {
 	actualValue, err = s.Get(bucket, key)
 	require.NoError(t, err)
 	assert.Nil(t, actualValue)
+
+	require.NoError(t, s.Close())
+	_, err = s.Get(bucket, key)
+	assert.Equal(t, errClosed, err)
 }

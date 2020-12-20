@@ -4,6 +4,9 @@ package chezmoi
 // and panics on any writes.
 type EmptyPersistentState struct{}
 
+// Close does nothing.
+func (EmptyPersistentState) Close() error { return nil }
+
 // CopyTo does nothing.
 func (EmptyPersistentState) CopyTo(PersistentState) error { return nil }
 

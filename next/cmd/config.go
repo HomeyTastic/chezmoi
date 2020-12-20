@@ -462,6 +462,10 @@ func (c *Config) destPathInfos(sourceState *chezmoi.SourceState, args []string, 
 }
 
 func (c *Config) doPurge(purgeOptions *purgeOptions) error {
+	if err := c.persistentState.Close(); err != nil {
+		return err
+	}
+
 	absSlashPersistentStateFile, err := c.persistentStateFile().Normalize(c.normalizedHomeDir)
 	if err != nil {
 		return err
@@ -844,6 +848,9 @@ func (c *Config) persistentPreRunRootE(cmd *cobra.Command, args []string) error 
 			}
 			dryRunPeristentState := chezmoi.NewMockPersistentState()
 			if err := persistentState.CopyTo(dryRunPeristentState); err != nil {
+				return err
+			}
+			if err := persistentState.Close(); err != nil {
 				return err
 			}
 			c.persistentState = dryRunPeristentState

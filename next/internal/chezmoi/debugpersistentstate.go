@@ -17,6 +17,15 @@ func NewDebugPersistentState(s PersistentState, logger zerolog.Logger) *DebugPer
 	}
 }
 
+// Close implements PersistentState.Close.
+func (s *DebugPersistentState) Close() error {
+	err := s.s.Close()
+	s.logger.Debug().
+		Err(err).
+		Msg("Close")
+	return err
+}
+
 // CopyTo implements PersistentState.CopyTo.
 func (s *DebugPersistentState) CopyTo(p PersistentState) error {
 	err := s.s.CopyTo(p)
