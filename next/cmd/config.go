@@ -47,8 +47,8 @@ type Config struct {
 
 	bds *xdg.BaseDirectorySpecification
 
-	configFileStr   string
 	fs              vfs.FS
+	configFile      string
 	baseSystem      chezmoi.System
 	sourceSystem    chezmoi.System
 	destSystem      chezmoi.System
@@ -301,7 +301,7 @@ func newConfig(options ...configOption) (*Config, error) {
 		}
 	}
 
-	c.configFileStr = defaultConfigFile(c.fs, c.bds).String()
+	c.configFile = defaultConfigFile(c.fs, c.bds).String()
 	c.SourceDir = defaultSourceDir(c.fs, c.bds).String()
 
 	c.normalizedHomeDir, err = chezmoi.NormalizePath(c.HomeDir)
@@ -568,8 +568,8 @@ func (c *Config) execute(args []string) error {
 }
 
 func (c *Config) persistentStateFile() *chezmoi.OSPath {
-	if c.configFileStr != "" {
-		return chezmoi.NewOSPath(c.configFileStr).Dir().Join(persistentStateFilename)
+	if c.configFile != "" {
+		return chezmoi.NewOSPath(c.configFile).Dir().Join(persistentStateFilename)
 	}
 	for _, configDir := range c.bds.ConfigDirs {
 		persistentStateFile := filepath.Join(configDir, "chezmoi", persistentStateFilename)
@@ -707,7 +707,7 @@ func (c *Config) newRootCmd() (*cobra.Command, error) {
 		}
 	}
 
-	persistentFlags.StringVarP(&c.configFileStr, "config", "c", c.configFileStr, "config file")
+	persistentFlags.StringVarP(&c.configFile, "config", "c", c.configFile, "config file")
 	persistentFlags.BoolVarP(&c.dryRun, "dry-run", "n", c.dryRun, "dry run")
 	persistentFlags.BoolVar(&c.force, "force", c.force, "force")
 	persistentFlags.BoolVarP(&c.keepGoing, "keep-going", "k", c.keepGoing, "keep going as far as possible after an error")
@@ -768,7 +768,7 @@ func (c *Config) persistentPreRunRootE(cmd *cobra.Command, args []string) error 
 	// FIXME factor out config check
 
 	var err error
-	c.normalizedConfigFile, err = chezmoi.NewOSPath(c.configFileStr).Normalize(c.normalizedHomeDir)
+	c.normalizedConfigFile, err = chezmoi.NewOSPath(c.configFile).Normalize(c.normalizedHomeDir)
 	if err != nil {
 		return err
 	}
@@ -789,9 +789,9 @@ func (c *Config) persistentPreRunRootE(cmd *cobra.Command, args []string) error 
 	}
 	if configErr != nil {
 		if !boolAnnotation(cmd, doesNotRequireValidConfig) {
-			return fmt.Errorf("invalid config: %s: %w", c.configFileStr, configErr)
+			return fmt.Errorf("invalid config: %s: %w", c.configFile, configErr)
 		}
-		cmd.Printf("warning: %s: %v\n", c.configFileStr, configErr)
+		cmd.Printf("warning: %s: %v\n", c.configFile, configErr)
 	}
 
 	if strings.ToLower(c.Color) == "auto" {
