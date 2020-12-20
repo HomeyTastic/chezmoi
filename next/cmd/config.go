@@ -59,7 +59,7 @@ type Config struct {
 	// Global configuration, settable in the config file.
 	HomeDir       string                 `mapstructure:"homeDir"`
 	SourceDir     string                 `mapstructure:"sourceDir"`
-	DestDirStr    string                 `mapstructure:"destDir"`
+	DestDir       string                 `mapstructure:"destDir"`
 	Umask         fileMode               `mapstructure:"umask"`
 	Format        string                 `mapstructure:"format"`
 	Remove        bool                   `mapstructure:"remove"`
@@ -191,7 +191,7 @@ func newConfig(options ...configOption) (*Config, error) {
 		bds:           bds,
 		fs:            vfs.OSFS,
 		HomeDir:       homeDir,
-		DestDirStr:    homeDir,
+		DestDir:       homeDir,
 		Umask:         fileMode(chezmoi.GetUmask()),
 		Color:         "auto",
 		Format:        "json",
@@ -690,7 +690,7 @@ func (c *Config) newRootCmd() (*cobra.Command, error) {
 	persistentFlags := rootCmd.PersistentFlags()
 
 	persistentFlags.StringVar(&c.Color, "color", c.Color, "colorize diffs")
-	persistentFlags.StringVarP(&c.DestDirStr, "destination", "D", c.DestDirStr, "destination directory")
+	persistentFlags.StringVarP(&c.DestDir, "destination", "D", c.DestDir, "destination directory")
 	persistentFlags.StringVar(&c.Format, "format", c.Format, "format ("+serializationFormatNamesStr()+")")
 	persistentFlags.BoolVar(&c.Remove, "remove", c.Remove, "remove targets")
 	persistentFlags.StringVarP(&c.SourceDir, "source", "S", c.SourceDir, "source directory")
@@ -831,7 +831,7 @@ func (c *Config) persistentPreRunRootE(cmd *cobra.Command, args []string) error 
 	if err != nil {
 		return err
 	}
-	c.normalizedDestDir, err = chezmoi.NewOSPath(c.DestDirStr).Normalize(c.normalizedHomeDir)
+	c.normalizedDestDir, err = chezmoi.NewOSPath(c.DestDir).Normalize(c.normalizedHomeDir)
 	if err != nil {
 		return err
 	}
