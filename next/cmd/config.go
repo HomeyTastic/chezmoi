@@ -58,7 +58,7 @@ type Config struct {
 
 	// Global configuration, settable in the config file.
 	HomeDir       string                 `mapstructure:"homeDir"`
-	SourceDirStr  string                 `mapstructure:"sourceDir"`
+	SourceDir     string                 `mapstructure:"sourceDir"`
 	DestDirStr    string                 `mapstructure:"destDir"`
 	Umask         fileMode               `mapstructure:"umask"`
 	Format        string                 `mapstructure:"format"`
@@ -302,7 +302,7 @@ func newConfig(options ...configOption) (*Config, error) {
 	}
 
 	c.configFileStr = defaultConfigFile(c.fs, c.bds).String()
-	c.SourceDirStr = defaultSourceDir(c.fs, c.bds).String()
+	c.SourceDir = defaultSourceDir(c.fs, c.bds).String()
 
 	c.normalizedHomeDir, err = chezmoi.NormalizePath(c.HomeDir)
 	if err != nil {
@@ -693,7 +693,7 @@ func (c *Config) newRootCmd() (*cobra.Command, error) {
 	persistentFlags.StringVarP(&c.DestDirStr, "destination", "D", c.DestDirStr, "destination directory")
 	persistentFlags.StringVar(&c.Format, "format", c.Format, "format ("+serializationFormatNamesStr()+")")
 	persistentFlags.BoolVar(&c.Remove, "remove", c.Remove, "remove targets")
-	persistentFlags.StringVarP(&c.SourceDirStr, "source", "S", c.SourceDirStr, "source directory")
+	persistentFlags.StringVarP(&c.SourceDir, "source", "S", c.SourceDir, "source directory")
 	persistentFlags.StringVar(&c.UseBuiltinGit, "use-builtin-git", c.UseBuiltinGit, "use builtin git")
 	for _, key := range []string{
 		"color",
@@ -827,7 +827,7 @@ func (c *Config) persistentPreRunRootE(cmd *cobra.Command, args []string) error 
 		}
 	}
 
-	c.normalizedSourceDir, err = chezmoi.NewOSPath(c.SourceDirStr).Normalize(c.normalizedHomeDir)
+	c.normalizedSourceDir, err = chezmoi.NewOSPath(c.SourceDir).Normalize(c.normalizedHomeDir)
 	if err != nil {
 		return err
 	}
