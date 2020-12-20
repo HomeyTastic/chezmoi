@@ -19,7 +19,7 @@ var (
 		regexp.MustCompile(`\.svg\z`),
 		regexp.MustCompile(`\A\.devcontainer/library-scripts\z`),
 		regexp.MustCompile(`\A\.git\z`),
-		regexp.MustCompile(`\Acompletions/chezmoi\.ps1\z`),
+		regexp.MustCompile(`\bchezmoi\.ps1\z`),
 		regexp.MustCompile(`\Achezmoi\.io/public\z`),
 		regexp.MustCompile(`\Achezmoi\.io/themes/book\z`),
 	}
