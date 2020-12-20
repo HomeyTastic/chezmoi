@@ -38,7 +38,7 @@ func (c *Config) newEditCmd() *cobra.Command {
 func (c *Config) runEditCmd(cmd *cobra.Command, args []string, s *chezmoi.SourceState) error {
 	var sourcePaths []string
 	if len(args) == 0 {
-		sourcePaths = []string{c.absSlashSourceDir}
+		sourcePaths = []string{c.normalizedSourceDir}
 	} else {
 		var err error
 		sourcePaths, err = c.sourcePaths(s, args)
@@ -57,5 +57,5 @@ func (c *Config) runEditCmd(cmd *cobra.Command, args []string, s *chezmoi.Source
 		return nil
 	}
 
-	return c.applyArgs(c.destSystem, c.absSlashDestDir, args, c.Edit.include, c.Edit.recursive, c.Umask.FileMode())
+	return c.applyArgs(c.destSystem, c.normalizedDestDir, args, c.Edit.include, c.Edit.recursive, c.Umask.FileMode())
 }

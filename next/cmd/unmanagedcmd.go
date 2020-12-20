@@ -25,14 +25,14 @@ func (c *Config) newUnmanagedCmd() *cobra.Command {
 
 func (c *Config) runUnmanagedCmd(cmd *cobra.Command, args []string, sourceState *chezmoi.SourceState) error {
 	sb := strings.Builder{}
-	if err := vfs.WalkSlash(c.destSystem, c.absSlashDestDir, func(path string, info os.FileInfo, err error) error {
+	if err := vfs.WalkSlash(c.destSystem, c.normalizedDestDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
-		if path == c.absSlashDestDir {
+		if path == c.normalizedDestDir {
 			return nil
 		}
-		targetName := chezmoi.MustTrimDirPrefix(path, c.absSlashDestDir)
+		targetName := chezmoi.MustTrimDirPrefix(path, c.normalizedDestDir)
 		_, managed := sourceState.Entry(targetName)
 		ignored := sourceState.Ignored(targetName)
 		if !managed && !ignored {

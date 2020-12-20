@@ -32,7 +32,7 @@ func (c *Config) newVerifyCmd() *cobra.Command {
 
 func (c *Config) runVerifyCmd(cmd *cobra.Command, args []string) error {
 	dryRunSystem := chezmoi.NewDryRunSystem(c.destSystem)
-	if err := c.applyArgs(dryRunSystem, c.absSlashDestDir, args, c.verify.include, c.verify.recursive, c.Umask.FileMode()); err != nil {
+	if err := c.applyArgs(dryRunSystem, c.normalizedDestDir, args, c.verify.include, c.verify.recursive, c.Umask.FileMode()); err != nil {
 		return err
 	}
 	if dryRunSystem.Modified() {

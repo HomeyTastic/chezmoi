@@ -97,7 +97,7 @@ func (c *Config) newInitCmd() *cobra.Command {
 func (c *Config) runInitCmd(cmd *cobra.Command, args []string) error {
 	if len(args) == 0 {
 		if c.useBuiltinGit {
-			rawSourceDir, err := c.baseSystem.RawPath(c.absSlashSourceDir)
+			rawSourceDir, err := c.baseSystem.RawPath(c.normalizedSourceDir)
 			if err != nil {
 				return err
 			}
@@ -105,16 +105,16 @@ func (c *Config) runInitCmd(cmd *cobra.Command, args []string) error {
 			_, err = git.PlainInit(rawSourceDir, isBare)
 			return err
 		}
-		return c.run(c.absSlashSourceDir, c.Git.Command, []string{"init"})
+		return c.run(c.normalizedSourceDir, c.Git.Command, []string{"init"})
 	}
 
 	// Clone repo into source directory if it does not already exist.
-	_, err := c.baseSystem.Stat(path.Join(c.absSlashSourceDir, ".git"))
+	_, err := c.baseSystem.Stat(path.Join(c.normalizedSourceDir, ".git"))
 	switch {
 	case err == nil:
 		// Do nothing.
 	case os.IsNotExist(err):
-		rawSourceDir, err := c.baseSystem.RawPath(c.absSlashSourceDir)
+		rawSourceDir, err := c.baseSystem.RawPath(c.normalizedSourceDir)
 		if err != nil {
 			return err
 		}
@@ -179,7 +179,7 @@ func (c *Config) runInitCmd(cmd *cobra.Command, args []string) error {
 	if c.init.apply {
 		var args []string
 		recursive := false
-		if err := c.applyArgs(c.destSystem, c.absSlashDestDir, args, chezmoi.NewIncludeSet(chezmoi.IncludeAll), recursive, c.Umask.FileMode()); err != nil {
+		if err := c.applyArgs(c.destSystem, c.normalizedDestDir, args, chezmoi.NewIncludeSet(chezmoi.IncludeAll), recursive, c.Umask.FileMode()); err != nil {
 			return err
 		}
 	}
@@ -240,7 +240,7 @@ func (c *Config) createConfigFile(filename string, data []byte) ([]byte, error) 
 func (c *Config) findConfigTemplate() (string, string, []byte, error) {
 	for _, ext := range viper.SupportedExts {
 		filename := chezmoi.Prefix + "." + ext + chezmoi.TemplateSuffix
-		contents, err := c.baseSystem.ReadFile(path.Join(c.absSlashSourceDir, filename))
+		contents, err := c.baseSystem.ReadFile(path.Join(c.normalizedSourceDir, filename))
 		switch {
 		case os.IsNotExist(err):
 			continue

@@ -48,7 +48,7 @@ func (c *Config) runManagedCmd(cmd *cobra.Command, args []string, sourceState *c
 	sort.Strings(targetNames)
 	sb := strings.Builder{}
 	for _, targetName := range targetNames {
-		fmt.Fprintln(&sb, path.Join(c.absSlashDestDir, targetName))
+		fmt.Fprintln(&sb, path.Join(c.normalizedDestDir, targetName))
 	}
 	return c.writeOutputString(sb.String())
 }

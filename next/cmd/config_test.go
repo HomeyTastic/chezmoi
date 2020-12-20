@@ -137,7 +137,7 @@ func withTestUser(username string) configOption {
 		var homeDirStr string
 		switch runtime.GOOS {
 		case "windows":
-			homeDirStr = `C:\home\user`
+			homeDirStr = `c:\home\user`
 		default:
 			homeDirStr = "/home/user"
 		}

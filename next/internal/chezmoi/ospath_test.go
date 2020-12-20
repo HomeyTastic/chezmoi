@@ -59,7 +59,7 @@ func TestOSPathTildeAbsSlash(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			chezmoitest.SkipUnlessGOOS(t, tc.name)
 
-			actual, err := NewOSPath(tc.s).TildeAbsSlash(normalizedHomeDir)
+			actual, err := NewOSPath(tc.s).Normalize(normalizedHomeDir)
 			require.NoError(t, err)
 			assert.Equal(t, tc.expected, actual)
 		})
