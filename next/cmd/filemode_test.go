@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestPermValue(t *testing.T) {
+func TestFileMode(t *testing.T) {
 	for _, tc := range []struct {
 		s              string
 		expectedErr    bool
